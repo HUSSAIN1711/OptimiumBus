@@ -1,0 +1,25 @@
+# Core FastAPI dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database dependencies
+sqlalchemy==2.0.23
+psycopg2-binary==2.9.9
+alembic==1.12.1
+
+# Data validation and serialization
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Geospatial and optimization libraries (for future phases)
+osmnx==1.6.0
+networkx==3.2.1
+pandas==2.1.4
+geopy==2.4.1
+scikit-learn==1.3.2
+
+# Environment and configuration
+python-dotenv==1.0.0
+
+# CORS for frontend communication
+python-multipart==0.0.6
