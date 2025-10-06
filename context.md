@@ -343,54 +343,156 @@ lsof -ti:8000 | xargs kill -9  # On macOS/Linux
 - [ ] API documentation loads at http://localhost:8000/docs
 - [ ] Database connection test passes
 
+
+## 🔧 Phase 2 Setup Instructions (Geospatial & Road Network)
+
+1) Ensure DB and PostGIS are ready (if not already):
+```bash
+psql -U postgres -c "CREATE DATABASE optimumbus_db;"
+psql -U postgres -d optimumbus_db -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+```
+
+2) Initialize tables and spatial indexes:
+```bash
+cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus/backend
+python init_db.py
+```
+
+3) Run the backend API:
+```bash
+python run.py
+# Swagger: http://localhost:8000/docs
+```
+
+4) Optional: Warm up OSMnx cache (Irvine default):
+```bash
+curl -X GET http://localhost:8000/api/v1/stops/road-network/info
+```
+
+5) Create a bus stop (snapping on by default; you can disable via snap_to_road=false):
+```bash
+curl -X POST "http://localhost:8000/api/v1/stops/?snap_to_road=true" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "name": "Demo Stop",
+    "description": "Test",
+    "latitude": 33.6846,
+    "longitude": -117.8265,
+    "demand_weight": 0.5
+  }'
+```
+
 ---
 
-## 📋 Next Session Checklist
+## 🔧 Phase 3 Setup Instructions (Optimization API)
 
-When you're ready to continue, here's what to do:
+1) Start the backend (if not running):
+```bash
+cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus/backend
+python run.py
+```
 
-1. **Verify Phase 1 is working:**
-   - [ ] Backend server starts without errors
-   - [ ] Database connection is successful
-   - [ ] API documentation loads at http://localhost:8000/docs
+2) Add several bus stops (see Phase 2 step 5) so clusters can form.
 
-2. **Begin Phase 2:**
-   - [ ] Create bus stops API router
-   - [ ] Implement OSMnx integration
-   - [ ] Add coordinate snapping functionality
+3) Run optimization for N buses (example: 2):
+```bash
+curl -X POST "http://localhost:8000/api/v1/optimize/routes?num_buses=2"
+```
 
-3. **Test with real data:**
-   - [ ] Create a few bus stops via API
-   - [ ] Verify geospatial data storage
-   - [ ] Test coordinate snapping with real coordinates
-
----
-
-## 🎯 Success Criteria
-
-**Phase 1 ✅ Complete:** Backend foundation with database models and configuration
-**Phase 2 ✅ Complete:** Functional bus stop management with real-world road network integration
-**Phase 3 ✅ Complete:** Working route optimization algorithms with clustering and TSP
-**Phase 4 ✅ Complete:** Complete web application with interactive map interface
-
-## 🎉 PROJECT COMPLETE!
-
-**All phases completed successfully!** The OptimumBus application is now a fully functional bus route optimization system with:
-
-- ✅ **Backend API**: FastAPI with PostgreSQL/PostGIS, OSMnx integration, and optimization algorithms
-- ✅ **Frontend UI**: React with Google Maps, interactive stop management, and route visualization
-- ✅ **Real-world Integration**: Coordinate snapping, road network data, and geospatial queries
-- ✅ **Optimization Engine**: KMeans clustering and TSP routing for multi-bus scenarios
+4) Response schema highlights:
+- routes: array of { bus_index, stop_ids[], coordinates[] }
 
 ---
 
-## 📝 Notes for Next Session
+## 🔧 Phase 4 Setup Instructions (React Frontend)
 
-- The backend foundation is solid and ready for API endpoint development
-- All dependencies are installed and configured
-- Database models are ready for geospatial extensions
-- Focus next on creating the bus stops CRUD API and OSMnx integration
-- Consider testing with a small geographic area first (e.g., a city center)
-- **IMPORTANT**: All future code changes will be made in the `/Users/hmahuvaw/Coding/OptimumBus/OptimiumBus/` workspace
+1) Install and run the frontend:
+```bash
+cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus/frontend
+npm install
+cp env.example .env  # add your Google Maps API key
+npm start
+```
 
-**Ready to proceed to Phase 2 when you are!** 🚀
+2) Ensure backend CORS allows http://localhost:3000 (configured in backend settings).
+
+3) Use the UI:
+- Click on the map to add stops, then fill details in the form
+- Use the optimization panel to enter number of buses and submit
+- View colored polylines for each route
+
+---
+
+## 🧪 Testing Foundation (Phase 1) – Setup & Configuration ✅
+
+**What We Added:**
+- ✅ `tests/` directory with `__init__.py`
+- ✅ `pytest.ini` at project root (pythonpath set to `OptimiumBus/backend`)
+- ✅ `tests/conftest.py` with fixtures:
+  - Session-scoped setup/teardown that creates and drops tables in a separate test DB
+  - `db_session` fixture providing a SQLAlchemy session bound to the test DB
+  - `client` fixture providing a FastAPI `TestClient` that overrides `get_db` to use the test session
+
+**Environment:**
+- Set `TEST_DATABASE_URL` (optional). Defaults to development URL with db name replaced by `optimumbus_db_test`.
+  - Example: `TEST_DATABASE_URL=postgresql://user:pass@localhost:5432/optimumbus_db_test`
+
+**Commands:**
+```bash
+cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus
+pip install pytest
+
+# Ensure the test database exists and PostGIS is enabled
+psql -U postgres -c "CREATE DATABASE optimumbus_db_test;"
+psql -U postgres -d optimumbus_db_test -c "CREATE EXTENSION IF NOT EXISTS postgis;"
+
+# Run tests
+pytest
+```
+
+**Why This Setup:**
+- Separate test database avoids polluting development data
+- Fixtures in `conftest.py` centralize setup/teardown and dependency override
+- `TestClient` runs real HTTP requests against the app using the test session
+
+Next Testing Steps:
+- Phase 2: Add API tests for `/stops/` (happy and sad paths)
+- Phase 3: Add pure unit tests for optimization utilities (no DB/API)
+
+---
+
+## 🧪 Testing (Phase 2) – API Endpoint Tests ✅
+
+**What We Added:**
+- ✅ `tests/test_api_stops.py` with two tests for `/stops/`:
+  - `test_create_bus_stop_success` – verifies 201 Created and response fields
+  - `test_create_bus_stop_invalid_data` – verifies 422 on validation error
+- Tests pass `snap_to_road=False` to avoid external OSMnx calls for determinism
+
+**Run Tests:**
+```bash
+cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus
+pytest -q tests/test_api_stops.py
+```
+
+**Why:**
+- Ensures CRUD create endpoint is correct for both happy/sad paths
+- Keeps tests fast and reliable by avoiding network-bound snapping
+
+---
+
+## 🧪 Testing (Phase 3) – Core Logic Unit Tests ✅
+
+**What We Added:**
+- ✅ `app/core/graph_utils.py` with a pure `snap_to_nearest_node(graph, lat, lng)` using haversine distance
+- ✅ `tests/test_optimization_logic.py` unit test that builds a tiny NetworkX graph and asserts the nearest node ID
+
+**Run Tests:**
+```bash
+cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus
+pytest -q tests/test_optimization_logic.py
+```
+
+**Why:**
+- Tests algorithmic logic in isolation (no API, no DB, no network)
+- Fast, deterministic verification of nearest-node snapping
