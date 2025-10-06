@@ -8,9 +8,10 @@ while Pydantic schemas handle data validation and serialization for the API.
 
 from typing import Optional
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Float, DateTime, func
+from sqlalchemy import Column, Integer, String, Float, DateTime, func, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func as sql_func
+from sqlalchemy.dialects.postgresql import GEOMETRY
 from pydantic import BaseModel, Field, validator
 from app.db.database import Base
 import uuid
@@ -35,6 +36,15 @@ class BusStop(Base):
     # Geospatial coordinates (latitude and longitude)
     latitude = Column(Float, nullable=False, index=True)
     longitude = Column(Float, nullable=False, index=True)
+    
+    # PostGIS geometry column for advanced geospatial queries
+    # This stores the point geometry in WGS84 (SRID 4326)
+    geometry = Column(
+        GEOMETRY('POINT', srid=4326),
+        nullable=True,
+        index=True,
+        server_default=text("ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)")
+    )
     
     # Passenger demand weight (0.0 to 1.0, where 1.0 is highest demand)
     # This will be used in the optimization algorithm to prioritize stops

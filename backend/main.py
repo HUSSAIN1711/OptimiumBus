@@ -9,6 +9,8 @@ bus stops and optimizing routes.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
+from app.api import bus_stops
+from app.api import optimization
 
 # Create FastAPI application instance
 app = FastAPI(
@@ -27,6 +29,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include API routers
+app.include_router(bus_stops.router, prefix=settings.API_V1_STR)
+app.include_router(optimization.router, prefix=settings.API_V1_STR)
 
 
 @app.get("/")
