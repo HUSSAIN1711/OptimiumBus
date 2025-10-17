@@ -496,3 +496,9 @@ pytest -q tests/test_optimization_logic.py
 **Why:**
 - Tests algorithmic logic in isolation (no API, no DB, no network)
 - Fast, deterministic verification of nearest-node snapping
+
+
+
+
+
+YASH HAS JOINED
