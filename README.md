@@ -7,7 +7,7 @@ A FastAPI-based backend for bus route optimization using geospatial data and mac
 ### Prerequisites
 
 - Python 3.8+
-- PostgreSQL 12+ with PostGIS extension
+- PostgreSQL 17+ with PostGIS extension
 - pip (Python package manager)
 
 ### Installation
