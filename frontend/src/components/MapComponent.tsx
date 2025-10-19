@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Loader } from '@googlemaps/js-api-loader';
+import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 import { BusStop } from '../types';
 
 interface MapComponentProps {
@@ -23,19 +23,19 @@ const MapComponent: React.FC<MapComponentProps> = ({
   // Initialize Google Maps
   useEffect(() => {
     const initMap = async () => {
-      const loader = new Loader({
-        apiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
-        version: 'weekly',
-        libraries: ['places']
-      });
-
       try {
-        const google = await loader.load();
+        // Set the API key and options
+        setOptions({
+          key: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
+        });
+
+        // Import the Maps library
+        const { Map } = await importLibrary('maps');
         
-        const mapInstance = new google.maps.Map(mapRef.current!, {
+        const mapInstance = new Map(mapRef.current!, {
           center: { lat: 33.6846, lng: -117.8265 }, // Irvine, CA
           zoom: 13,
-          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          mapTypeId: 'roadmap',
         });
 
         // Add click listener for adding stops
@@ -58,62 +58,84 @@ const MapComponent: React.FC<MapComponentProps> = ({
   useEffect(() => {
     if (!map) return;
 
-    // Clear existing markers
-    markers.forEach(marker => marker.setMap(null));
+    const updateMarkers = async () => {
+      try {
+        // Import Marker library
+        const { Marker } = await importLibrary('marker');
+        
+        // Clear existing markers
+        markers.forEach(marker => marker.setMap(null));
 
-    const newMarkers = busStops.map(stop => {
-      const marker = new google.maps.Marker({
-        position: { lat: stop.latitude, lng: stop.longitude },
-        map: map,
-        title: stop.name,
-        label: {
-          text: stop.name.charAt(0).toUpperCase(),
-          color: 'white',
-          fontWeight: 'bold'
-        }
-      });
+        const newMarkers = busStops.map(stop => {
+          const marker = new Marker({
+            position: { lat: stop.latitude, lng: stop.longitude },
+            map: map,
+            title: stop.name,
+            label: {
+              text: stop.name.charAt(0).toUpperCase(),
+              color: 'white',
+              fontWeight: 'bold'
+            }
+          });
 
-      marker.addListener('click', () => {
-        onStopClick(stop);
-      });
+          marker.addListener('click', () => {
+            onStopClick(stop);
+          });
 
-      return marker;
-    });
+          return marker;
+        });
 
-    setMarkers(newMarkers);
-  }, [map, busStops, onStopClick]);
+        setMarkers(newMarkers);
+      } catch (error) {
+        console.error('Error creating markers:', error);
+      }
+    };
+
+    updateMarkers();
+  }, [map, busStops, onStopClick, markers]);
 
   // Update polylines when routes change
   useEffect(() => {
     if (!map) return;
 
-    // Clear existing polylines
-    polylines.forEach(polyline => polyline.setMap(null));
+    const updatePolylines = async () => {
+      try {
+        // Import Polyline library
+        const { Polyline } = await importLibrary('maps');
+        
+        // Clear existing polylines
+        polylines.forEach(polyline => polyline.setMap(null));
 
-    const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
 
-    const newPolylines = routes.map((route, index) => {
-      if (route.coordinates.length < 2) return null;
+        const newPolylines = routes.map((route, index) => {
+          if (route.coordinates.length < 2) return null;
 
-      const path = route.coordinates.map(coord => ({
-        lat: coord.lat,
-        lng: coord.lng
-      }));
+          const path = route.coordinates.map(coord => ({
+            lat: coord.lat,
+            lng: coord.lng
+          }));
 
-      const polyline = new google.maps.Polyline({
-        path: path,
-        geodesic: true,
-        strokeColor: colors[index % colors.length],
-        strokeOpacity: 0.8,
-        strokeWeight: 4,
-        map: map
-      });
+          const polyline = new Polyline({
+            path: path,
+            geodesic: true,
+            strokeColor: colors[index % colors.length],
+            strokeOpacity: 0.8,
+            strokeWeight: 4,
+            map: map
+          });
 
-      return polyline;
-    }).filter(Boolean) as google.maps.Polyline[];
+          return polyline;
+        }).filter(Boolean) as google.maps.Polyline[];
 
-    setPolylines(newPolylines);
-  }, [map, routes]);
+        setPolylines(newPolylines);
+      } catch (error) {
+        console.error('Error creating polylines:', error);
+      }
+    };
+
+    updatePolylines();
+  }, [map, routes, polylines]);
 
   return (
     <div 

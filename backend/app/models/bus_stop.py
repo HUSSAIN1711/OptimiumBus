@@ -11,7 +11,7 @@ from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, DateTime, func, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func as sql_func
-from sqlalchemy.dialects.postgresql import GEOMETRY
+from geoalchemy2 import Geometry
 from pydantic import BaseModel, Field, validator
 from app.db.database import Base
 import uuid
@@ -39,11 +39,11 @@ class BusStop(Base):
     
     # PostGIS geometry column for advanced geospatial queries
     # This stores the point geometry in WGS84 (SRID 4326)
+    # Note: Geometry is computed in Python, not via database default
     geometry = Column(
-        GEOMETRY('POINT', srid=4326),
+        Geometry('POINT', srid=4326),
         nullable=True,
-        index=True,
-        server_default=text("ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)")
+        index=True
     )
     
     # Passenger demand weight (0.0 to 1.0, where 1.0 is highest demand)

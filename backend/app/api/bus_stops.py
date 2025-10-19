@@ -9,6 +9,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, asc
+from geoalchemy2.shape import from_shape
+from shapely.geometry import Point
 
 from app.db.database import get_db
 from app.models.bus_stop import (
@@ -154,6 +156,12 @@ async def create_bus_stop(
             demand_weight=bus_stop.demand_weight
         )
         
+        # Compute geometry from coordinates (PostgreSQL can't do this in DEFAULT)
+        db_bus_stop.geometry = from_shape(
+            Point(final_longitude, final_latitude), 
+            srid=4326
+        )
+        
         # Add to database
         db.add(db_bus_stop)
         db.commit()
@@ -196,6 +204,13 @@ async def update_bus_stop(
         update_data = bus_stop_update.dict(exclude_unset=True)
         for field, value in update_data.items():
             setattr(db_bus_stop, field, value)
+        
+        # If coordinates were updated, recompute geometry
+        if 'latitude' in update_data or 'longitude' in update_data:
+            db_bus_stop.geometry = from_shape(
+                Point(db_bus_stop.longitude, db_bus_stop.latitude), 
+                srid=4326
+            )
         
         # Save changes
         db.commit()

@@ -26,7 +26,7 @@ def main():
         # Create all tables
         logger.info("Creating database tables...")
         init_db()
-        logger.info("✅ Database tables created successfully")
+        logger.info("Database tables created successfully")
         
         # Create spatial indexes
         logger.info("Creating spatial indexes...")
@@ -35,17 +35,17 @@ def main():
         
         try:
             if create_spatial_indexes(db):
-                logger.info("✅ Spatial indexes created successfully")
+                logger.info("Spatial indexes created successfully")
             else:
-                logger.warning("⚠️ Failed to create spatial indexes")
+                logger.warning("Failed to create spatial indexes")
         finally:
             db.close()
         
-        logger.info("🎉 Database initialization completed successfully!")
+        logger.info("Database initialization completed successfully!")
         logger.info("You can now start the FastAPI server with: python run.py")
         
     except Exception as e:
-        logger.error(f"❌ Database initialization failed: {e}")
+        logger.error(f"Database initialization failed: {e}")
         sys.exit(1)
 
 

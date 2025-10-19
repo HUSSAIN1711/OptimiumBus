@@ -6,7 +6,10 @@ which automatically loads environment variables and provides type validation.
 """
 
 from typing import List
-from pydantic import BaseSettings, validator
+
+from networkx import fiedler_vector
+from pydantic_settings import BaseSettings
+from pydantic import validator
 
 
 class Settings(BaseSettings):
@@ -23,9 +26,9 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # Database Configuration
-    DATABASE_URL: str = "postgresql://username:password@localhost:5432/optimumbus_db"
-    POSTGRES_USER: str = "username"
-    POSTGRES_PASSWORD: str = "password"
+    DATABASE_URL: str = "postgresql://hmahuvaw:171104@localhost:5432/optimumbus_db"
+    POSTGRES_USER: str = "hmahuvaw"
+    POSTGRES_PASSWORD: str = "171104"
     POSTGRES_DB: str = "optimumbus_db"
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
@@ -55,11 +58,13 @@ class Settings(BaseSettings):
         """
         Pydantic configuration
         
-        env_file: Load settings from .env file
+        env_file: Load settings from .env.local file in main directory
         case_sensitive: Environment variable names are case-sensitive
+        extra: Ignore extra fields (like REACT_APP_* variables)
         """
-        env_file = ".env"
+        env_file = "../.env.local"
         case_sensitive = True
+        extra = "ignore"
 
 
 # Create a global settings instance

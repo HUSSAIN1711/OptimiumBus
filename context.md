@@ -1,14 +1,46 @@
-# OptimumBus Project Context & Progress Tracker
+# OptimumBus Project Context & AI Workspace Guide
 
 ## 🎯 Project Overview
-Building a **Bus Route Optimization** web application where users can define bus stops on a map, specify the number of available buses, and receive optimized routes based on travel time and passenger demand.
+**OptimumBus** is a full-stack web application for bus route optimization. Users can define bus stops on an interactive map, specify the number of available buses, and receive optimized routes based on travel time and passenger demand using advanced clustering and pathfinding algorithms.
 
-## 🏗️ Tech Stack
-- **Frontend**: React with Google Maps API
-- **Backend**: Python with FastAPI
-- **Database**: PostgreSQL with PostGIS extension
-- **GIS/Data**: OSMnx, NetworkX, Pandas, GeoPy
-- **Core Logic**: K-Means/DBSCAN clustering, Dijkstra/A* pathfinding, VRP heuristics
+## 🏗️ Tech Stack & Architecture
+- **Frontend**: React 19.2.0 + TypeScript with Google Maps JavaScript API
+- **Backend**: Python 3.13 + FastAPI with SQLAlchemy ORM
+- **Database**: PostgreSQL 17+ with PostGIS extension for geospatial operations
+- **GIS/Data Processing**: OSMnx, NetworkX, Pandas, GeoPy for road network analysis
+- **Optimization**: K-Means clustering, nearest-neighbor heuristics, VRP algorithms
+- **API Integration**: Google Maps JavaScript API v3 (weekly release)
+- **Development**: pytest for testing, Alembic for migrations
+
+## 🤖 AI Workspace Context
+
+### Current Project Status
+- **Development Phase**: Production-ready MVP with full-stack implementation
+- **Backend**: Complete FastAPI application with geospatial capabilities
+- **Frontend**: React application with Google Maps integration
+- **Database**: PostgreSQL with PostGIS for spatial operations
+- **Testing**: Comprehensive test suite with pytest
+- **Documentation**: Developer-focused README and AI-focused context
+
+### Key Technical Decisions Made
+1. **Google Maps API**: Using `@googlemaps/js-api-loader` v2.0.1+ with `setOptions()` and `importLibrary()` pattern
+2. **Database**: PostgreSQL with PostGIS for advanced geospatial queries and coordinate snapping
+3. **Backend Architecture**: Modular FastAPI structure with separate concerns (api/, core/, models/, db/)
+4. **Frontend Architecture**: Component-based React with TypeScript for type safety
+5. **Optimization Algorithm**: K-Means clustering + nearest-neighbor heuristic for route optimization
+
+### Environment Variables Required
+- **Single File**: All environment variables are managed in `.env.local` (main directory)
+- **Frontend**: `REACT_APP_GOOGLE_MAPS_API_KEY` (Google Maps JavaScript API)
+- **Backend**: Database connection variables (DATABASE_URL, POSTGRES_*, etc.)
+- **Location**: `/Users/hmahuvaw/Coding/OptimumBus/OptimiumBus/.env.local`
+
+### Common AI Tasks in This Workspace
+1. **Adding new API endpoints**: Follow the pattern in `backend/app/api/`
+2. **Database model changes**: Update SQLAlchemy models in `backend/app/models/`
+3. **Frontend component updates**: Modify React components in `frontend/src/components/`
+4. **Testing**: Add tests in `tests/` directory following existing patterns
+5. **Documentation**: Update both README.md (developer) and context.md (AI) as needed
 
 ## ✅ COMPLETED PHASES
 
@@ -157,342 +189,3 @@ OptimiumBus/frontend/
 - 📱 **Responsive Design**: Works on desktop and mobile devices
 
 **Current Status:** Phase 4 is complete. The full-stack application is ready for use with a modern React frontend and comprehensive backend API.
-
----
-
-## 🔧 Phase 1 Setup Instructions
-
-**Complete setup guide to get Phase 1 running:**
-
-### **Step 1: Python Environment Setup**
-
-1. **Navigate to backend directory:**
-   ```bash
-   cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus/backend
-   ```
-
-2. **Create Python virtual environment:**
-   ```bash
-   # Create virtual environment
-   python3 -m venv venv
-   
-   # Activate virtual environment
-   source venv/bin/activate  # On macOS/Linux
-   # or
-   venv\Scripts\activate     # On Windows
-   
-   # Verify activation (should show (venv) in terminal prompt)
-   which python  # Should point to venv/bin/python
-   ```
-
-3. **Install Python dependencies:**
-   ```bash
-   # Upgrade pip first
-   pip install --upgrade pip
-   
-   # Install all required packages
-   pip install -r requirements.txt
-   
-   # Verify installation
-   pip list | grep fastapi  # Should show FastAPI installed
-   ```
-
-### **Step 2: PostgreSQL & PostGIS Setup**
-
-1. **Install PostgreSQL (if not already installed):**
-   ```bash
-   # On macOS with Homebrew
-   brew install postgresql
-   brew services start postgresql
-   
-   # On Ubuntu/Debian
-   sudo apt update
-   sudo apt install postgresql postgresql-contrib
-   sudo systemctl start postgresql
-   
-   # On Windows: Download from https://www.postgresql.org/download/windows/
-   ```
-
-2. **Create database and user:**
-   ```bash
-   # Connect to PostgreSQL as superuser
-   sudo -u postgres psql  # On Linux
-   # or
-   psql postgres  # On macOS/Windows
-   ```
-
-3. **Run these SQL commands:**
-   ```sql
-   -- Create database
-   CREATE DATABASE optimumbus_db;
-   
-   -- Create user (optional, or use existing user)
-   CREATE USER optimumbus_user WITH PASSWORD 'your_secure_password';
-   
-   -- Grant privileges
-   GRANT ALL PRIVILEGES ON DATABASE optimumbus_db TO optimumbus_user;
-   
-   -- Connect to the new database
-   \c optimumbus_db;
-   
-   -- Install PostGIS extension
-   CREATE EXTENSION postgis;
-   
-   -- Verify PostGIS installation
-   SELECT PostGIS_Version();
-   
-   -- Exit PostgreSQL
-   \q
-   ```
-
-### **Step 3: Environment Configuration**
-
-1. **Create environment file:**
-   ```bash
-   # Copy the example file
-   cp env.example .env
-   ```
-
-2. **Edit .env file with your database credentials:**
-   ```bash
-   # Open .env file in your editor
-   nano .env  # or use your preferred editor
-   ```
-
-3. **Update these variables in .env:**
-   ```env
-   # Database Configuration - UPDATE THESE VALUES
-   DATABASE_URL=postgresql://optimumbus_user:your_secure_password@localhost:5432/optimumbus_db
-   POSTGRES_USER=optimumbus_user
-   POSTGRES_PASSWORD=your_secure_password
-   POSTGRES_DB=optimumbus_db
-   POSTGRES_HOST=localhost
-   POSTGRES_PORT=5432
-   
-   # Application Configuration
-   APP_NAME=OptimumBus API
-   DEBUG=True
-   API_V1_STR=/api/v1
-   
-   # CORS Configuration (for future frontend)
-   ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
-   ```
-
-### **Step 4: Test Phase 1 Setup**
-
-1. **Start the FastAPI server:**
-   ```bash
-   # Make sure virtual environment is activated
-   source venv/bin/activate  # If not already active
-   
-   # Start the server
-   python run.py
-   ```
-
-2. **Verify everything is working:**
-   - ✅ Server should start without errors
-   - ✅ Should show: "Uvicorn running on http://0.0.0.0:8000"
-   - ✅ Visit http://localhost:8000 - should show welcome message
-   - ✅ Visit http://localhost:8000/docs - should show Swagger UI
-   - ✅ Visit http://localhost:8000/health - should show health status
-
-3. **Test database connection:**
-   ```bash
-   # In another terminal, test database connection
-   python -c "
-   from app.db.database import engine
-   from sqlalchemy import text
-   with engine.connect() as conn:
-       result = conn.execute(text('SELECT version()'))
-       print('Database connected:', result.fetchone()[0])
-   "
-   ```
-
-### **Troubleshooting Common Issues:**
-
-**Database Connection Error:**
-```bash
-# Check if PostgreSQL is running
-brew services list | grep postgresql  # On macOS
-sudo systemctl status postgresql     # On Linux
-
-# Check if database exists
-psql -l | grep optimumbus_db
-```
-
-**Python Import Errors:**
-```bash
-# Reinstall dependencies
-pip install --force-reinstall -r requirements.txt
-```
-
-**Port Already in Use:**
-```bash
-# Kill process on port 8000
-lsof -ti:8000 | xargs kill -9  # On macOS/Linux
-```
-
-### **Phase 1 Verification Checklist:**
-- [ ] Python virtual environment created and activated
-- [ ] All dependencies installed successfully
-- [ ] PostgreSQL running and accessible
-- [ ] Database `optimumbus_db` created
-- [ ] PostGIS extension installed
-- [ ] `.env` file configured with correct credentials
-- [ ] FastAPI server starts without errors
-- [ ] API documentation loads at http://localhost:8000/docs
-- [ ] Database connection test passes
-
-
-## 🔧 Phase 2 Setup Instructions (Geospatial & Road Network)
-
-1) Ensure DB and PostGIS are ready (if not already):
-```bash
-psql -U postgres -c "CREATE DATABASE optimumbus_db;"
-psql -U postgres -d optimumbus_db -c "CREATE EXTENSION IF NOT EXISTS postgis;"
-```
-
-2) Initialize tables and spatial indexes:
-```bash
-cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus/backend
-python init_db.py
-```
-
-3) Run the backend API:
-```bash
-python run.py
-# Swagger: http://localhost:8000/docs
-```
-
-4) Optional: Warm up OSMnx cache (Irvine default):
-```bash
-curl -X GET http://localhost:8000/api/v1/stops/road-network/info
-```
-
-5) Create a bus stop (snapping on by default; you can disable via snap_to_road=false):
-```bash
-curl -X POST "http://localhost:8000/api/v1/stops/?snap_to_road=true" \
-  -H 'Content-Type: application/json' \
-  -d '{
-    "name": "Demo Stop",
-    "description": "Test",
-    "latitude": 33.6846,
-    "longitude": -117.8265,
-    "demand_weight": 0.5
-  }'
-```
-
----
-
-## 🔧 Phase 3 Setup Instructions (Optimization API)
-
-1) Start the backend (if not running):
-```bash
-cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus/backend
-python run.py
-```
-
-2) Add several bus stops (see Phase 2 step 5) so clusters can form.
-
-3) Run optimization for N buses (example: 2):
-```bash
-curl -X POST "http://localhost:8000/api/v1/optimize/routes?num_buses=2"
-```
-
-4) Response schema highlights:
-- routes: array of { bus_index, stop_ids[], coordinates[] }
-
----
-
-## 🔧 Phase 4 Setup Instructions (React Frontend)
-
-1) Install and run the frontend:
-```bash
-cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus/frontend
-npm install
-cp env.example .env  # add your Google Maps API key
-npm start
-```
-
-2) Ensure backend CORS allows http://localhost:3000 (configured in backend settings).
-
-3) Use the UI:
-- Click on the map to add stops, then fill details in the form
-- Use the optimization panel to enter number of buses and submit
-- View colored polylines for each route
-
----
-
-## 🧪 Testing Foundation (Phase 1) – Setup & Configuration ✅
-
-**What We Added:**
-- ✅ `tests/` directory with `__init__.py`
-- ✅ `pytest.ini` at project root (pythonpath set to `OptimiumBus/backend`)
-- ✅ `tests/conftest.py` with fixtures:
-  - Session-scoped setup/teardown that creates and drops tables in a separate test DB
-  - `db_session` fixture providing a SQLAlchemy session bound to the test DB
-  - `client` fixture providing a FastAPI `TestClient` that overrides `get_db` to use the test session
-
-**Environment:**
-- Set `TEST_DATABASE_URL` (optional). Defaults to development URL with db name replaced by `optimumbus_db_test`.
-  - Example: `TEST_DATABASE_URL=postgresql://user:pass@localhost:5432/optimumbus_db_test`
-
-**Commands:**
-```bash
-cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus
-pip install pytest
-
-# Ensure the test database exists and PostGIS is enabled
-psql -U postgres -c "CREATE DATABASE optimumbus_db_test;"
-psql -U postgres -d optimumbus_db_test -c "CREATE EXTENSION IF NOT EXISTS postgis;"
-
-# Run tests
-pytest
-```
-
-**Why This Setup:**
-- Separate test database avoids polluting development data
-- Fixtures in `conftest.py` centralize setup/teardown and dependency override
-- `TestClient` runs real HTTP requests against the app using the test session
-
-Next Testing Steps:
-- Phase 2: Add API tests for `/stops/` (happy and sad paths)
-- Phase 3: Add pure unit tests for optimization utilities (no DB/API)
-
----
-
-## 🧪 Testing (Phase 2) – API Endpoint Tests ✅
-
-**What We Added:**
-- ✅ `tests/test_api_stops.py` with two tests for `/stops/`:
-  - `test_create_bus_stop_success` – verifies 201 Created and response fields
-  - `test_create_bus_stop_invalid_data` – verifies 422 on validation error
-- Tests pass `snap_to_road=False` to avoid external OSMnx calls for determinism
-
-**Run Tests:**
-```bash
-cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus
-pytest -q tests/test_api_stops.py
-```
-
-**Why:**
-- Ensures CRUD create endpoint is correct for both happy/sad paths
-- Keeps tests fast and reliable by avoiding network-bound snapping
-
----
-
-## 🧪 Testing (Phase 3) – Core Logic Unit Tests ✅
-
-**What We Added:**
-- ✅ `app/core/graph_utils.py` with a pure `snap_to_nearest_node(graph, lat, lng)` using haversine distance
-- ✅ `tests/test_optimization_logic.py` unit test that builds a tiny NetworkX graph and asserts the nearest node ID
-
-**Run Tests:**
-```bash
-cd /Users/hmahuvaw/Coding/OptimumBus/OptimiumBus
-pytest -q tests/test_optimization_logic.py
-```
-
-**Why:**
-- Tests algorithmic logic in isolation (no API, no DB, no network)
-- Fast, deterministic verification of nearest-node snapping
