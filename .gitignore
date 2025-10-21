@@ -1,2 +1,138 @@
-# Ignore local environment config
+# ================================
+# OptimumBus .gitignore
+# FastAPI + React + PostgreSQL/PostGIS
+# ================================
+
+# --------------------------------
+# Python / FastAPI Backend
+# --------------------------------
+
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+.env/
 .env.local
+.venv/
+
+# Build / distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Cache & temporary files
+*.log
+*.pid
+*.out
+*.tmp
+*.bak
+*.swp
+.cache/
+backend/cache/
+backend/__pycache__/
+
+# Database / geospatial data
+*.sqlite3
+*.db
+*.pkl
+*.geojson
+*.shp
+*.shx
+*.prj
+*.dbf
+road_networks/*.pkl
+road_networks/*.cache
+
+# Local development configuration
+backend/.env.local
+backend/.env
+backend/.pytest_cache/
+pytest_cache/
+.DS_Store
+
+# OS-specific
+Thumbs.db
+.DS_Store
+Icon?
+ehthumbs.db
+
+# --------------------------------
+# Node / React Frontend
+# --------------------------------
+
+# Dependencies
+frontend/node_modules/
+frontend/.pnp/
+frontend/.pnp.js
+
+# Build output
+frontend/build/
+frontend/dist/
+frontend/.next/
+frontend/out/
+
+# Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# Environment files
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Cache / temp files
+frontend/.cache/
+frontend/.parcel-cache/
+frontend/coverage/
+
+# --------------------------------
+# Test & Coverage
+# --------------------------------
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+*.lcov
+tests/__pycache__/
+tests/.pytest_cache/
+
+# --------------------------------
+# IDE / Editor / System Files
+# --------------------------------
+.vscode/
+.idea/
+*.iml
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+.project
+.settings/
+.pydevproject
+
+# --------------------------------
+# Miscellaneous
+# --------------------------------
+*.bak
+*.orig
+*.rej
+*.swp
+*.swo
+*.tmp
+*.log
+*.lock
+
+# Ignore compiled frontend assets in backend static (if any)
+backend/static/*
+!backend/static/.keep

@@ -25,9 +25,10 @@ function App() {
       setIsLoading(true);
       const stops = await busStopAPI.getAll();
       setBusStops(stops);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading bus stops:', error);
-      alert('Failed to load bus stops. Make sure the backend is running.');
+      const errorMessage = error.response?.data?.detail || error.message || 'Failed to load bus stops. Make sure the backend is running.';
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -49,6 +50,12 @@ function App() {
     try {
       setIsLoading(true);
       
+      // Validate form data
+      if (!formData.name || !formData.name.trim()) {
+        alert('Please enter a valid bus stop name.');
+        return;
+      }
+      
       if (editingStop) {
         // Update existing stop
         const updatedStop = await busStopAPI.update(editingStop.id, formData);
@@ -62,9 +69,10 @@ function App() {
       setShowForm(false);
       setEditingStop(null);
       setClickedCoords(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving bus stop:', error);
-      alert('Failed to save bus stop. Please try again.');
+      const errorMessage = error.response?.data?.detail || error.message || 'Failed to save bus stop. Please try again.';
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -86,9 +94,10 @@ function App() {
       await busStopAPI.delete(id);
       setBusStops(prev => prev.filter(stop => stop.id !== id));
       setRoutes([]); // Clear routes when stops change
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting bus stop:', error);
-      alert('Failed to delete bus stop. Please try again.');
+      const errorMessage = error.response?.data?.detail || error.message || 'Failed to delete bus stop. Please try again.';
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -99,9 +108,10 @@ function App() {
       setIsLoading(true);
       const result = await optimizationAPI.optimizeRoutes(numBuses);
       setRoutes(result.routes);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error optimizing routes:', error);
-      alert('Failed to optimize routes. Make sure you have bus stops and the backend is running.');
+      const errorMessage = error.response?.data?.detail || error.message || 'Failed to optimize routes. Make sure you have bus stops and the backend is running.';
+      alert(errorMessage);
     } finally {
       setIsLoading(false);
     }

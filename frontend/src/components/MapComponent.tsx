@@ -92,7 +92,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     };
 
     updateMarkers();
-  }, [map, busStops, onStopClick, markers]);
+  }, [map, busStops, onStopClick]);
 
   // Update polylines when routes change
   useEffect(() => {
@@ -135,7 +135,7 @@ const MapComponent: React.FC<MapComponentProps> = ({
     };
 
     updatePolylines();
-  }, [map, routes, polylines]);
+  }, [map, routes]);
 
   return (
     <div 
